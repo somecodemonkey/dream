@@ -33,7 +33,16 @@ test('can create a css styled dreamscape', function() {
 });
 
 test('can create a css styled dreamscape in container', function() {
-    var scape = new Dream.Scape("dream-style-in-container");
+    var scape = new Dream.Scape("dream-in-container");
+    expect(4);
+    ok(scape, "Somethings should be created");
+    ok(typeof(scape) == "object", "Created a class");
+    equal(scape.height, 400, "Height should be equal");
+    equal(scape.width, 400, "Width should be equal");
+});
+
+test('can create a css styled dreamscape in container', function() {
+    var scape = new Dream.Scape("dream-in-scroll");
     expect(4);
     ok(scape, "Somethings should be created");
     ok(typeof(scape) == "object", "Created a class");

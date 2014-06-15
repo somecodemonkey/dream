@@ -44,6 +44,63 @@ Dream.window = window;
 
 })();
 (function () {
+    Dream.Canvas = Dream.util.createClass({
+
+        _height: 0,
+
+        _width: 0,
+
+        _canvas: null,
+
+        _canvasContext: null,
+
+        initialize: function (options) {
+            this._setupCanvas(options);
+        },
+
+        _setupCanvas: function (options) {
+            this._canvas = Dream.util.createCanvasElement();
+            this._canvasContext = this._canvas.getContext('2d');
+        }
+
+    })
+})();
+(function () {
+    Dream.Layer = Dream.util.createClass({
+
+        /**
+         * Cache flag
+         */
+        _dirty:  false,
+
+        _canvas: null,
+
+        //TODO caching
+
+        initialize: function (options) {
+            this._setupCanvas();
+        },
+
+        _setupCanvas: function () {
+            this._canvas = Dream.util.createCanvasElement();
+            this._canvasContext = this._canvas.getContext('2d');
+        },
+
+        setDimensions: function (width, height) {
+            this._canvas.width  = width;
+            this._canvas.height = height;
+            this._canvas.style.width  = width + 'px';
+            this._canvas.style.height = height + 'px';
+            this._canvas.style.position = "absolute";
+        },
+
+        getCanvasDOM: function () {
+            return this._canvas;
+        }
+
+    })
+})();
+(function () {
 
     /**
      * The canvas
@@ -67,6 +124,11 @@ Dream.window = window;
         _dom: null,
 
         /**
+         * Type string for serialization
+         */
+        type: "scape",
+
+        /**
          *
          * @param dom
          * @param options
@@ -85,6 +147,7 @@ Dream.window = window;
                 this._setDOMStyle(this.width, this.height);
             } else {
                 // scrollHeight vs clientHeight vs offsetHeight?
+                // IE 9+
                 this.width = this._dom.scrollWidth;
                 this.height = this._dom.scrollHeight;
             }
@@ -93,6 +156,7 @@ Dream.window = window;
         _setDOMStyle: function (width, height) {
             this._dom.style.width = width + 'px';
             this._dom.style.height = height + 'px';
+            this._dom.style.position = "relative";
         },
 
         _setOptions: function (options) {
@@ -101,6 +165,16 @@ Dream.window = window;
 
         _setDOM: function (dom) {
             this._dom = Dream.document.getElementById(dom);
+        },
+
+        fitToScape: function (layer) {
+            layer.setDimensions(this.width, this.height);
+        },
+
+        addLayer: function (layer) {
+            this.fitToScape(layer);
+            this._dom.appendChild(layer.getCanvasDOM());
+            this._layers.push(layer);
         }
     });
 

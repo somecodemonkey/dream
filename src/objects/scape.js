@@ -22,6 +22,11 @@
         _dom: null,
 
         /**
+         * Type string for serialization
+         */
+        type: "scape",
+
+        /**
          *
          * @param dom
          * @param options
@@ -40,6 +45,7 @@
                 this._setDOMStyle(this.width, this.height);
             } else {
                 // scrollHeight vs clientHeight vs offsetHeight?
+                // IE 9+
                 this.width = this._dom.scrollWidth;
                 this.height = this._dom.scrollHeight;
             }
@@ -48,6 +54,7 @@
         _setDOMStyle: function (width, height) {
             this._dom.style.width = width + 'px';
             this._dom.style.height = height + 'px';
+            this._dom.style.position = "relative";
         },
 
         _setOptions: function (options) {
@@ -56,6 +63,16 @@
 
         _setDOM: function (dom) {
             this._dom = Dream.document.getElementById(dom);
+        },
+
+        fitToScape: function (layer) {
+            layer.setDimensions(this.width, this.height);
+        },
+
+        addLayer: function (layer) {
+            this.fitToScape(layer);
+            this._dom.appendChild(layer.getCanvasDOM());
+            this._layers.push(layer);
         }
     });
 
