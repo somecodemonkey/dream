@@ -38,6 +38,30 @@ Dream.window = window;
 
             Dream.util.extend(newClass, props[0]);
             return newClass;
+        },
+
+        addEvent: function (dom, event, func) {
+            if (Dream.window.addEventListener) {
+                dom.addEventListener(event, func, false);
+            } else {
+                // TODO legacy mapping for events
+                dom.attachEvent(event, func, false);
+            }
+        },
+
+        getCoords: function (object, event) {
+            var top = object.top,
+                left = object.left;
+
+            if (object instanceof Element && object.nodeType) {
+                top = object.offsetTop;
+                left = object.offsetLeft;
+            }
+
+            return {
+                x: event.x - left,
+                y: event.y - top
+            };
         }
     };
 
@@ -66,6 +90,10 @@ Dream.window = window;
     })
 })();
 (function () {
+    /**
+     * Dream Layer
+     * @type {*}
+     */
     Dream.Layer = Dream.util.createClass({
 
         /**
@@ -86,7 +114,7 @@ Dream.window = window;
 
         _setupCanvasDOM: function () {
             this._canvas = Dream.util.createCanvasElement();
-            this._canvas.id = name;
+            this._canvas.id = this.name;
             this._canvasContext = this._canvas.getContext('2d');
             // TODO set id for canvas as well
             this._canvas.style.position = "absolute";
@@ -115,6 +143,9 @@ Dream.window = window;
         }
 
     })
+})();
+(function () {
+
 })();
 (function () {
 
@@ -154,6 +185,8 @@ Dream.window = window;
             this._setDOM(dom);
             this.setDimensions(options);
             this._setOptions(options);
+
+            this._initListeners();
         },
 
         setDimensions: function (options) {
@@ -194,5 +227,54 @@ Dream.window = window;
             this._layers.push(layer);
         }
     });
+
+})();
+(function () {
+
+    var PREFIX = '_';
+
+    var MOUSEDOWN = 'mousedown',
+        MOUSEUP = 'mouseup',
+        MOUSEOVER = 'mouseover',
+        MOUSEOUT = 'mouseout',
+        MOUSEMOVE = 'mousemove';
+
+
+    var EVENTS = [MOUSEDOWN, MOUSEUP, MOUSEOVER, MOUSEOUT, MOUSEMOVE],
+        EVENTSLENGTH = EVENTS.length;
+
+    Dream.util.extend(Dream.Scape, {
+
+        _initListeners: function () {
+            for(var i = 0; i < EVENTSLENGTH; i++) {
+                Dream.util.addEvent(this._dom, EVENTS[i], this[PREFIX + EVENTS[i]]);
+            }
+        },
+
+        _mousedown: function (e) {
+            var coords = Dream.util.getCoords(this, e);
+            console.log('mousedown', coords);
+        },
+
+        _mouseup: function (e) {
+            var coords = Dream.util.getCoords(this, e);
+            console.log('mouseup', coords);
+        },
+
+        _mouseover: function (e) {
+            var coords = Dream.util.getCoords(this, e);
+            console.log('mouseover', coords);
+        },
+
+        _mouseout: function (e) {
+            var coords = Dream.util.getCoords(this, e);
+            console.log('mouseleave', coords);
+        },
+
+        _mousemove: function (e) {
+//            console.log('mousemove', e);
+        }
+
+    })
 
 })();

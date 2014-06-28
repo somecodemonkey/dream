@@ -1,4 +1,8 @@
 (function () {
+    /**
+     * Dream Layer
+     * @type {*}
+     */
     Dream.Layer = Dream.util.createClass({
 
         /**

@@ -31,6 +31,30 @@
 
             Dream.util.extend(newClass, props[0]);
             return newClass;
+        },
+
+        addEvent: function (dom, event, func) {
+            if (Dream.window.addEventListener) {
+                dom.addEventListener(event, func, false);
+            } else {
+                // TODO legacy mapping for events
+                dom.attachEvent(event, func, false);
+            }
+        },
+
+        getCoords: function (object, event) {
+            var top = object.top,
+                left = object.left;
+
+            if (object instanceof Element && object.nodeType) {
+                top = object.offsetTop;
+                left = object.offsetLeft;
+            }
+
+            return {
+                x: event.x - left,
+                y: event.y - top
+            };
         }
     };
 

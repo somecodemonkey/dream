@@ -36,6 +36,8 @@
             this._setDOM(dom);
             this.setDimensions(options);
             this._setOptions(options);
+
+            this._initListeners();
         },
 
         setDimensions: function (options) {
