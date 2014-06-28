@@ -1,4 +1,4 @@
-/*! dream - v0.0.0 - 2014-06-15
+/*! dream - v0.0.0 - 2014-06-27
 * Copyright (c) 2014 Darby Perez; Licensed  */
 var Dream = Dream || {};
 
@@ -71,31 +71,46 @@ Dream.window = window;
         /**
          * Cache flag
          */
-        _dirty:  false,
+        _dirty: false,
 
         _canvas: null,
+
+        name: "",
 
         //TODO caching
 
         initialize: function (options) {
-            this._setupCanvas();
+            // extend options?
+            this._setupCanvasDOM();
         },
 
-        _setupCanvas: function () {
+        _setupCanvasDOM: function () {
             this._canvas = Dream.util.createCanvasElement();
             this._canvasContext = this._canvas.getContext('2d');
+            // TODO set id for canvas as well
+            this._canvas.style.position = "absolute";
         },
 
-        setDimensions: function (width, height) {
-            this._canvas.width  = width;
+        _setOptions: function (options) {
+            Dream.util.extend(this, options);
+        },
+
+        setCanvasDimensions: function (width, height) {
+            this._canvas.width = width;
             this._canvas.height = height;
-            this._canvas.style.width  = width + 'px';
+        },
+
+        setStyleDimensions: function (width, height) {
+            this._canvas.style.width = width + 'px';
             this._canvas.style.height = height + 'px';
-            this._canvas.style.position = "absolute";
         },
 
         getCanvasDOM: function () {
             return this._canvas;
+        },
+
+        getCanvasContext: function () {
+            return this._canvasContext;
         }
 
     })
@@ -168,7 +183,8 @@ Dream.window = window;
         },
 
         fitToScape: function (layer) {
-            layer.setDimensions(this.width, this.height);
+            layer.setCanvasDimensions(this.width, this.height);
+            layer.setStyleDimensions(this.width, this.height);
         },
 
         addLayer: function (layer) {

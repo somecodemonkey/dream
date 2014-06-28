@@ -4,7 +4,7 @@
         /**
          * Cache flag
          */
-        _dirty:  false,
+        _dirty: false,
 
         _canvas: null,
 
@@ -21,18 +21,21 @@
             this._canvas = Dream.util.createCanvasElement();
             this._canvasContext = this._canvas.getContext('2d');
             // TODO set id for canvas as well
+            this._canvas.style.position = "absolute";
         },
 
         _setOptions: function (options) {
             Dream.util.extend(this, options);
         },
 
-        setDimensions: function (width, height) {
-            this._canvas.width  = width;
+        setCanvasDimensions: function (width, height) {
+            this._canvas.width = width;
             this._canvas.height = height;
-            this._canvas.style.width  = width + 'px';
+        },
+
+        setStyleDimensions: function (width, height) {
+            this._canvas.style.width = width + 'px';
             this._canvas.style.height = height + 'px';
-            this._canvas.style.position = "absolute";
         },
 
         getCanvasDOM: function () {

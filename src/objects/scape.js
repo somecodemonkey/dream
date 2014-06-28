@@ -66,7 +66,8 @@
         },
 
         fitToScape: function (layer) {
-            layer.setDimensions(this.width, this.height);
+            layer.setCanvasDimensions(this.width, this.height);
+            layer.setStyleDimensions(this.width, this.height);
         },
 
         addLayer: function (layer) {
