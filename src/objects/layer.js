@@ -8,7 +8,7 @@
 
         _canvas: null,
 
-        name: "",
+        name: "layer",
 
         //TODO caching
 
@@ -19,6 +19,7 @@
 
         _setupCanvasDOM: function () {
             this._canvas = Dream.util.createCanvasElement();
+            this._canvas.id = this.name;
             this._canvasContext = this._canvas.getContext('2d');
             // TODO set id for canvas as well
             this._canvas.style.position = "absolute";

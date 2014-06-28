@@ -49,5 +49,3 @@ test('can create a css styled dreamscape in container', function() {
     equal(scape.height, 400, "Height should be equal");
     equal(scape.width, 400, "Width should be equal");
 });
-
-// TODO Scrollable container test

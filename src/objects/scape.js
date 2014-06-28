@@ -34,11 +34,11 @@
         initialize: function (dom, options) {
             // TODO args error catching
             this._setDOM(dom);
-            this._setDimensions(options);
+            this.setDimensions(options);
             this._setOptions(options);
         },
 
-        _setDimensions: function (options) {
+        setDimensions: function (options) {
             if (options && options.height && options.width) {
                 this.width = options.width;
                 this.height = options.height;

@@ -75,7 +75,7 @@ Dream.window = window;
 
         _canvas: null,
 
-        name: "",
+        name: "layer",
 
         //TODO caching
 
@@ -86,6 +86,7 @@ Dream.window = window;
 
         _setupCanvasDOM: function () {
             this._canvas = Dream.util.createCanvasElement();
+            this._canvas.id = name;
             this._canvasContext = this._canvas.getContext('2d');
             // TODO set id for canvas as well
             this._canvas.style.position = "absolute";
@@ -151,11 +152,11 @@ Dream.window = window;
         initialize: function (dom, options) {
             // TODO args error catching
             this._setDOM(dom);
-            this._setDimensions(options);
+            this.setDimensions(options);
             this._setOptions(options);
         },
 
-        _setDimensions: function (options) {
+        setDimensions: function (options) {
             if (options && options.height && options.width) {
                 this.width = options.width;
                 this.height = options.height;
