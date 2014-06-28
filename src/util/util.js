@@ -2,23 +2,33 @@
 
     var slice = Array.prototype.slice;
 
-    Dream.util = {
-        extend: function (dest, src) {
-            for (var key in src) {
-                if (typeof (dest) == "function" && src.hasOwnProperty(key)) {
-                    dest.prototype[key] = src[key];
-                } else if (src.hasOwnProperty(key)) {
-                    dest[key] = src[key];
-                }
+    function extend (dest, src) {
+        for (var key in src) {
+            if (typeof (dest) == "function" && src.hasOwnProperty(key)) {
+                dest.prototype[key] = src[key];
+            } else if (src.hasOwnProperty(key)) {
+                dest[key] = src[key];
             }
-            return dest;
-        },
+        }
+        return dest;
+    }
+
+    function subClass () {};
+
+    Dream.util = {
+        extend: extend,
+
         createCanvasElement: function () {
             return Dream.document.createElement('canvas');
         },
 
         createClass: function () {
             var props = slice.call(arguments, 0);
+
+            if (typeof props[0] === 'function') {
+                // subclass
+            }
+
             var newClass = function (){
                 this.initialize.apply(this, arguments);
             };
@@ -29,7 +39,8 @@
 
             newClass.prototype.constructor = newClass;
 
-            Dream.util.extend(newClass, props[0]);
+            extend(newClass, props[0]);
+
             return newClass;
         },
 
@@ -55,6 +66,10 @@
                 x: event.x - left,
                 y: event.y - top
             };
+        },
+
+        subClass: function () {
+
         }
     };
 

@@ -26,6 +26,10 @@
          */
         type: "scape",
 
+        width: 0,
+
+        height: 0,
+
         /**
          *
          * @param dom

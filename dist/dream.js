@@ -1,4 +1,4 @@
-/*! dream - v0.0.0 - 2014-06-27
+/*! dream - v0.0.0 - 2014-06-28
 * Copyright (c) 2014 Darby Perez; Licensed  */
 var Dream = Dream || {};
 
@@ -9,23 +9,33 @@ Dream.window = window;
 
     var slice = Array.prototype.slice;
 
-    Dream.util = {
-        extend: function (dest, src) {
-            for (var key in src) {
-                if (typeof (dest) == "function" && src.hasOwnProperty(key)) {
-                    dest.prototype[key] = src[key];
-                } else if (src.hasOwnProperty(key)) {
-                    dest[key] = src[key];
-                }
+    function extend (dest, src) {
+        for (var key in src) {
+            if (typeof (dest) == "function" && src.hasOwnProperty(key)) {
+                dest.prototype[key] = src[key];
+            } else if (src.hasOwnProperty(key)) {
+                dest[key] = src[key];
             }
-            return dest;
-        },
+        }
+        return dest;
+    }
+
+    function subClass () {};
+
+    Dream.util = {
+        extend: extend,
+
         createCanvasElement: function () {
             return Dream.document.createElement('canvas');
         },
 
         createClass: function () {
             var props = slice.call(arguments, 0);
+
+            if (typeof props[0] === 'function') {
+                // subclass
+            }
+
             var newClass = function (){
                 this.initialize.apply(this, arguments);
             };
@@ -36,7 +46,8 @@ Dream.window = window;
 
             newClass.prototype.constructor = newClass;
 
-            Dream.util.extend(newClass, props[0]);
+            extend(newClass, props[0]);
+
             return newClass;
         },
 
@@ -62,6 +73,10 @@ Dream.window = window;
                 x: event.x - left,
                 y: event.y - top
             };
+        },
+
+        subClass: function () {
+
         }
     };
 
@@ -146,6 +161,30 @@ Dream.window = window;
 })();
 (function () {
 
+
+    var baseId = Date.now() || +new Date;
+
+    function getId () {
+        return ++baseId;
+    }
+
+    /**
+     * Base help
+     * @type {*}
+     */
+    Dream.Object = Dream.util.createClass({
+
+        width: 0,
+
+        height: 0,
+
+        initialize: function (options) {
+
+            this.id = getId();
+        }
+
+    });
+
 })();
 (function () {
 
@@ -174,6 +213,10 @@ Dream.window = window;
          * Type string for serialization
          */
         type: "scape",
+
+        width: 0,
+
+        height: 0,
 
         /**
          *
