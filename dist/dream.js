@@ -1,4 +1,4 @@
-/*! dream - v0.0.0 - 2014-06-28
+/*! dream - v0.0.0 - 2014-07-06
 * Copyright (c) 2014 Darby Perez; Licensed  */
 var Dream = Dream || {};
 
@@ -20,7 +20,14 @@ Dream.window = window;
         return dest;
     }
 
-    function subClass () {};
+    function callSuper (parent) {
+        return function () {
+            var method = arguments[0];
+            if (method) {
+                parent.prototype[method].apply(this, slice.call(arguments, 1));
+            }
+        };
+    }
 
     Dream.util = {
         extend: extend,
@@ -30,11 +37,9 @@ Dream.window = window;
         },
 
         createClass: function () {
-            var props = slice.call(arguments, 0);
 
-            if (typeof props[0] === 'function') {
-                // subclass
-            }
+            var props = slice.call(arguments, 0),
+                parent, index = 0;
 
             var newClass = function (){
                 this.initialize.apply(this, arguments);
@@ -46,7 +51,15 @@ Dream.window = window;
 
             newClass.prototype.constructor = newClass;
 
-            extend(newClass, props[0]);
+            if (typeof props[index] === 'function') {
+                // subclass
+                parent = props[index];
+                extend(newClass, parent);
+                newClass.prototype.callSuper = callSuper(parent);
+                index++;
+            }
+
+            extend(newClass, props[index]);
 
             return newClass;
         },
@@ -73,10 +86,6 @@ Dream.window = window;
                 x: event.x - left,
                 y: event.y - top
             };
-        },
-
-        subClass: function () {
-
         }
     };
 
@@ -179,12 +188,40 @@ Dream.window = window;
         height: 0,
 
         initialize: function (options) {
-
             this.id = getId();
+
+            this._set(options || {});
+        },
+
+        _set: function (options) {
+            for (var key in options) {
+                this[key] = options[key];
+            }
+        },
+
+        render: function (ctx) {
+            /* Override this */
         }
 
     });
 
+})();
+(function () {
+    Dream.Rect = Dream.util.createClass(Dream.Object, {
+
+        width: 0,
+
+        height: 0,
+
+        initialize: function (options) {
+            this.callSuper('initialize');
+        },
+
+        render: function (ctx) {
+            /* Override this */
+        }
+
+    });
 })();
 (function () {
 

@@ -21,7 +21,7 @@ test('can extend an object', function() {
 });
 
 test('can extend an a function', function() {
-//    expect(6);
+    expect(6);
     var extend = {
         "up": 1,
         "all": 2,

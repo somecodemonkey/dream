@@ -13,7 +13,14 @@
         return dest;
     }
 
-    function subClass () {};
+    function callSuper (parent) {
+        return function () {
+            var method = arguments[0];
+            if (method) {
+                parent.prototype[method].apply(this, slice.call(arguments, 1));
+            }
+        };
+    }
 
     Dream.util = {
         extend: extend,
@@ -23,11 +30,9 @@
         },
 
         createClass: function () {
-            var props = slice.call(arguments, 0);
 
-            if (typeof props[0] === 'function') {
-                // subclass
-            }
+            var props = slice.call(arguments, 0),
+                parent, index = 0;
 
             var newClass = function (){
                 this.initialize.apply(this, arguments);
@@ -39,7 +44,15 @@
 
             newClass.prototype.constructor = newClass;
 
-            extend(newClass, props[0]);
+            if (typeof props[index] === 'function') {
+                // subclass
+                parent = props[index];
+                extend(newClass, parent);
+                newClass.prototype.callSuper = callSuper(parent);
+                index++;
+            }
+
+            extend(newClass, props[index]);
 
             return newClass;
         },
@@ -66,10 +79,6 @@
                 x: event.x - left,
                 y: event.y - top
             };
-        },
-
-        subClass: function () {
-
         }
     };
 

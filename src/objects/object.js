@@ -18,8 +18,19 @@
         height: 0,
 
         initialize: function (options) {
-
             this.id = getId();
+
+            this._set(options || {});
+        },
+
+        _set: function (options) {
+            for (var key in options) {
+                this[key] = options[key];
+            }
+        },
+
+        render: function (ctx) {
+            /* Override this */
         }
 
     });
