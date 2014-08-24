@@ -2,6 +2,12 @@
 
     var slice = Array.prototype.slice;
 
+    var baseId = Date.now() || +new Date;
+
+    function getId () {
+        return ++baseId;
+    }
+
     function extend (dest, src) {
         for (var key in src) {
             if (typeof (dest) == "function" && src.hasOwnProperty(key)) {
@@ -83,6 +89,10 @@
                 x: event.x - left,
                 y: event.y - top
             };
+        },
+
+        uid: function() {
+            return getId();
         }
     };
 

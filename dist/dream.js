@@ -9,6 +9,12 @@ Dream.window = window;
 
     var slice = Array.prototype.slice;
 
+    var baseId = Date.now() || +new Date;
+
+    function getId () {
+        return ++baseId;
+    }
+
     function extend (dest, src) {
         for (var key in src) {
             if (typeof (dest) == "function" && src.hasOwnProperty(key)) {
@@ -90,6 +96,10 @@ Dream.window = window;
                 x: event.x - left,
                 y: event.y - top
             };
+        },
+
+        uid: function() {
+            return getId();
         }
     };
 
@@ -193,13 +203,6 @@ Dream.window = window;
 })();
 (function () {
 
-
-    var baseId = Date.now() || +new Date;
-
-    function getId () {
-        return ++baseId;
-    }
-
     /**
      * Base help
      * @type {*}
@@ -219,7 +222,7 @@ Dream.window = window;
         fill: '',
 
         initialize: function (options) {
-            this.id = getId();
+            this.id = Dream.util.uid();
 
             this.setOptions(options || {});
         },

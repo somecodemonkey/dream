@@ -1,12 +1,5 @@
 (function () {
 
-
-    var baseId = Date.now() || +new Date;
-
-    function getId () {
-        return ++baseId;
-    }
-
     /**
      * Base help
      * @type {*}
@@ -26,7 +19,7 @@
         fill: '',
 
         initialize: function (options) {
-            this.id = getId();
+            this.id = Dream.util.uid();
 
             this.setOptions(options || {});
         },
