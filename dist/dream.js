@@ -12,6 +12,7 @@ Dream.window = window;
     function extend (dest, src) {
         for (var key in src) {
             if (typeof (dest) == "function" && src.hasOwnProperty(key)) {
+                console.log("DEST IS FUNCTION ",key, dest.type);
                 dest.prototype[key] = src[key];
             } else if (src.hasOwnProperty(key)) {
                 dest[key] = src[key];
@@ -29,6 +30,8 @@ Dream.window = window;
         };
     }
 
+    function baseClass () {}
+
     Dream.util = {
         extend: extend,
 
@@ -41,27 +44,29 @@ Dream.window = window;
             var props = slice.call(arguments, 0),
                 parent, index = 0;
 
-            var newClass = function (){
+            var Class = function (){
                 this.initialize.apply(this, arguments);
             };
 
-            newClass.prototype.initialize = function () {
+            Class.prototype.initialize = function () {
                 /* You must override this function */
             };
 
-            newClass.prototype.constructor = newClass;
+            Class.prototype.constructor = Class;
 
             if (typeof props[index] === 'function') {
                 // subclass
                 parent = props[index];
-                extend(newClass, parent);
-                newClass.prototype.callSuper = callSuper(parent);
+                baseClass.prototype = parent.prototype;
+                baseClass.prototype.callSuper = callSuper(parent);
+
+                Class.prototype = new baseClass();
+                extend(Class, parent);
                 index++;
             }
 
-            extend(newClass, props[index]);
-
-            return newClass;
+            extend(Class, props[index]);
+            return Class;
         },
 
         addEvent: function (dom, event, func) {
@@ -177,6 +182,10 @@ Dream.window = window;
         return ++baseId;
     }
 
+    function setOptions(opts) {
+
+    }
+
     /**
      * Base help
      * @type {*}
@@ -191,13 +200,17 @@ Dream.window = window;
 
         left: 0,
 
+        evented: true,
+
+        fill: '',
+
         initialize: function (options) {
             this.id = getId();
 
-            this._set(options || {});
+            this.setOptions(options || {});
         },
 
-        _set: function (options) {
+        setOptions: function (options) {
             for (var key in options) {
                 this[key] = options[key];
             }
@@ -213,26 +226,19 @@ Dream.window = window;
 (function () {
     Dream.Rect = Dream.util.createClass(Dream.Object, {
 
-        width: 0,
-
-        height: 0,
-
-        top: 0,
-
-        left:0,
-
-        fill: 'white',
+        type: 'dream-rect',
 
         initialize: function (options) {
-            this.callSuper('initialize');
+            this.callSuper('initialize', options);
         },
 
         render: function (ctx) {
             /* Override this */
             ctx.save();
-            context.rect(this.left, this.top, this.width, this.height);
+            ctx.translate(this.top, this.left);
+            ctx.rect(0, 0, this.width, this.height);
             ctx.fillStyle = this.fill;
-            context.fill();
+            ctx.fill();
             ctx.restore();
         }
 

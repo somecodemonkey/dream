@@ -5,6 +5,7 @@
     function extend (dest, src) {
         for (var key in src) {
             if (typeof (dest) == "function" && src.hasOwnProperty(key)) {
+                console.log("DEST IS FUNCTION ",key, dest.type);
                 dest.prototype[key] = src[key];
             } else if (src.hasOwnProperty(key)) {
                 dest[key] = src[key];
@@ -22,6 +23,8 @@
         };
     }
 
+    function baseClass () {}
+
     Dream.util = {
         extend: extend,
 
@@ -34,27 +37,28 @@
             var props = slice.call(arguments, 0),
                 parent, index = 0;
 
-            var newClass = function (){
+            var Class = function (){
                 this.initialize.apply(this, arguments);
             };
 
-            newClass.prototype.initialize = function () {
+            Class.prototype.initialize = function () {
                 /* You must override this function */
             };
 
-            newClass.prototype.constructor = newClass;
+            Class.prototype.constructor = Class;
 
             if (typeof props[index] === 'function') {
                 // subclass
                 parent = props[index];
-                extend(newClass, parent);
-                newClass.prototype.callSuper = callSuper(parent);
+                baseClass.prototype = parent.prototype;
+                baseClass.prototype.callSuper = callSuper(parent);
+
+                Class.prototype = new baseClass();
                 index++;
             }
 
-            extend(newClass, props[index]);
-
-            return newClass;
+            extend(Class, props[index]);
+            return Class;
         },
 
         addEvent: function (dom, event, func) {

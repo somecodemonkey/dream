@@ -21,13 +21,17 @@
 
         left: 0,
 
+        evented: true,
+
+        fill: '',
+
         initialize: function (options) {
             this.id = getId();
 
-            this._set(options || {});
+            this.setOptions(options || {});
         },
 
-        _set: function (options) {
+        setOptions: function (options) {
             for (var key in options) {
                 this[key] = options[key];
             }
