@@ -1,4 +1,4 @@
-/*! dream - v0.0.0 - 2014-08-23
+/*! dream - v0.0.0 - 2014-08-24
 * Copyright (c) 2014 Darby Perez; Licensed  */
 var Dream = Dream || {};
 
@@ -61,7 +61,6 @@ Dream.window = window;
                 baseClass.prototype.callSuper = callSuper(parent);
 
                 Class.prototype = new baseClass();
-                extend(Class, parent);
                 index++;
             }
 
@@ -132,6 +131,8 @@ Dream.window = window;
 
         _canvas: null,
 
+        _objects: [],
+
         name: "layer",
 
         //TODO caching
@@ -141,16 +142,22 @@ Dream.window = window;
             this._setupCanvasDOM();
         },
 
-        _setupCanvasDOM: function () {
-            this._canvas = Dream.util.createCanvasElement();
-            this._canvas.id = this.name;
-            this._canvasContext = this._canvas.getContext('2d');
-            // TODO set id for canvas as well
-            this._canvas.style.position = "absolute";
+        add: function (object) {
+            this._objects.push(object);
         },
 
-        _setOptions: function (options) {
-            Dream.util.extend(this, options);
+        getObjects: function () {
+            return this._objects;
+        },
+
+        /**
+         * Renders all objects on this layer
+         */
+        render: function () {
+            var ctx = this._canvasContext;
+            for (var i = 0; i < this._objects.length; i ++) {
+                this._objects[i].render(ctx);
+            }
         },
 
         setCanvasDimensions: function (width, height) {
@@ -169,8 +176,19 @@ Dream.window = window;
 
         getCanvasContext: function () {
             return this._canvasContext;
-        }
+        },
 
+        _setupCanvasDOM: function () {
+            this._canvas = Dream.util.createCanvasElement();
+            this._canvas.id = this.name;
+            this._canvasContext = this._canvas.getContext('2d');
+            // TODO set id for canvas as well
+            this._canvas.style.position = "absolute";
+        },
+
+        _setOptions: function (options) {
+            Dream.util.extend(this, options);
+        }
     })
 })();
 (function () {
@@ -180,10 +198,6 @@ Dream.window = window;
 
     function getId () {
         return ++baseId;
-    }
-
-    function setOptions(opts) {
-
     }
 
     /**
@@ -300,6 +314,12 @@ Dream.window = window;
                 // IE 9+
                 this.width = this._dom.scrollWidth;
                 this.height = this._dom.scrollHeight;
+            }
+        },
+
+        renderAll: function () {
+            for (var i = 0; i < this._layers.length; i ++){
+                this._layers[i].render();
             }
         },
 

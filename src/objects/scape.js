@@ -57,6 +57,12 @@
             }
         },
 
+        renderAll: function () {
+            for (var i = 0; i < this._layers.length; i ++){
+                this._layers[i].render();
+            }
+        },
+
         _setDOMStyle: function (width, height) {
             this._dom.style.width = width + 'px';
             this._dom.style.height = height + 'px';
