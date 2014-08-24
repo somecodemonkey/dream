@@ -26,8 +26,14 @@
          */
         type: "scape",
 
+        /**
+         *
+         */
         width: 0,
 
+        /**
+         *
+         */
         height: 0,
 
         /**
@@ -85,6 +91,8 @@
         addLayer: function (layer) {
             this.fitToScape(layer);
             this._dom.appendChild(layer.getCanvasDOM());
+            // Remove this line later
+            this._dom.appendChild(layer.getHitCanvasDOM());
             this._layers.push(layer);
         }
     });

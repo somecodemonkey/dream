@@ -6,6 +6,10 @@
      */
     Dream.Object = Dream.util.createClass({
 
+        _events: true,
+
+        _hitColor: '',
+
         width: 0,
 
         height: 0,
@@ -13,8 +17,6 @@
         top: 0,
 
         left: 0,
-
-        evented: true,
 
         fill: '',
 

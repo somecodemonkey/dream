@@ -29,6 +29,10 @@
         };
     }
 
+    function getColor() {
+        return '#'+Math.floor(Math.random()*16777215).toString(16);
+    }
+
     function baseClass () {}
 
     Dream.util = {
@@ -89,6 +93,10 @@
                 x: event.x - left,
                 y: event.y - top
             };
+        },
+
+        getColor: function () {
+            return getColor();
         },
 
         uid: function() {

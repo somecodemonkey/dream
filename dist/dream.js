@@ -36,6 +36,10 @@ Dream.window = window;
         };
     }
 
+    function getColor() {
+        return '#'+Math.floor(Math.random()*16777215).toString(16);
+    }
+
     function baseClass () {}
 
     Dream.util = {
@@ -98,6 +102,10 @@ Dream.window = window;
             };
         },
 
+        getColor: function () {
+            return getColor();
+        },
+
         uid: function() {
             return getId();
         }
@@ -128,6 +136,7 @@ Dream.window = window;
     })
 })();
 (function () {
+
     /**
      * Dream Layer
      * @type {*}
@@ -141,7 +150,11 @@ Dream.window = window;
 
         _canvas: null,
 
+        _hitCanvas: null,
+
         _objects: [],
+
+        _colorMap: {},
 
         name: "layer",
 
@@ -150,9 +163,11 @@ Dream.window = window;
         initialize: function (options) {
             // extend options?
             this._setupCanvasDOM();
+            this._setupHitCanvas();
         },
 
         add: function (object) {
+            object.layer = this;
             this._objects.push(object);
         },
 
@@ -164,15 +179,20 @@ Dream.window = window;
          * Renders all objects on this layer
          */
         render: function () {
-            var ctx = this._canvasContext;
+            var ctx = this._canvasContext,
+                hitctx = this._hitCanvasContext;
             for (var i = 0; i < this._objects.length; i ++) {
                 this._objects[i].render(ctx);
+//                this._objects[i].render(hitctx);
             }
         },
 
         setCanvasDimensions: function (width, height) {
             this._canvas.width = width;
             this._canvas.height = height;
+
+            this._hitCanvas.width = width;
+            this._hitCanvas.height = height;
         },
 
         setStyleDimensions: function (width, height) {
@@ -184,8 +204,21 @@ Dream.window = window;
             return this._canvas;
         },
 
+        // temp
+        getHitCanvasDOM: function () {
+            return this._hitCanvas;
+        },
+
         getCanvasContext: function () {
             return this._canvasContext;
+        },
+
+        getHitCanvasContext: function () {
+            return this._hitCanvasContext;
+        },
+
+        colorMap: function () {
+            return this._colorMap;
         },
 
         _setupCanvasDOM: function () {
@@ -194,6 +227,23 @@ Dream.window = window;
             this._canvasContext = this._canvas.getContext('2d');
             // TODO set id for canvas as well
             this._canvas.style.position = "absolute";
+        },
+
+        _setupHitCanvas: function () {
+            this._hitCanvas = Dream.util.createCanvasElement();
+            this._hitCanvas.style.position = "relative";
+            this._hitCanvasContext = this._hitCanvas.getContext('2d');
+        },
+
+        _setupObjectHit: function (object) {
+            var color = Dream.util.getColor();
+
+            while (this._colorMap[color]) {
+                color = Dream.util.getColor();
+            }
+
+            object._hitColor = color;
+            this._colorMap[color] = object;
         },
 
         _setOptions: function (options) {
@@ -209,6 +259,10 @@ Dream.window = window;
      */
     Dream.Object = Dream.util.createClass({
 
+        _events: true,
+
+        _hitColor: '',
+
         width: 0,
 
         height: 0,
@@ -216,8 +270,6 @@ Dream.window = window;
         top: 0,
 
         left: 0,
-
-        evented: true,
 
         fill: '',
 
@@ -289,8 +341,14 @@ Dream.window = window;
          */
         type: "scape",
 
+        /**
+         *
+         */
         width: 0,
 
+        /**
+         *
+         */
         height: 0,
 
         /**
@@ -348,11 +406,14 @@ Dream.window = window;
         addLayer: function (layer) {
             this.fitToScape(layer);
             this._dom.appendChild(layer.getCanvasDOM());
+            // Remove this line later
+            this._dom.appendChild(layer.getHitCanvasDOM());
             this._layers.push(layer);
         }
     });
 
 })();
+
 (function () {
 
     var PREFIX = '_';
