@@ -11,7 +11,6 @@
     function extend (dest, src) {
         for (var key in src) {
             if (typeof (dest) == "function" && src.hasOwnProperty(key)) {
-                console.log("DEST IS FUNCTION ",key, dest.type);
                 dest.prototype[key] = src[key];
             } else if (src.hasOwnProperty(key)) {
                 dest[key] = src[key];
