@@ -1,4 +1,4 @@
-/*! dream - v0.0.0 - 2014-07-06
+/*! dream - v0.0.0 - 2014-08-23
 * Copyright (c) 2014 Darby Perez; Licensed  */
 var Dream = Dream || {};
 
@@ -187,6 +187,10 @@ Dream.window = window;
 
         height: 0,
 
+        top: 0,
+
+        left: 0,
+
         initialize: function (options) {
             this.id = getId();
 
@@ -213,12 +217,23 @@ Dream.window = window;
 
         height: 0,
 
+        top: 0,
+
+        left:0,
+
+        fill: 'white',
+
         initialize: function (options) {
             this.callSuper('initialize');
         },
 
         render: function (ctx) {
             /* Override this */
+            ctx.save();
+            context.rect(this.left, this.top, this.width, this.height);
+            ctx.fillStyle = this.fill;
+            context.fill();
+            ctx.restore();
         }
 
     });

@@ -17,6 +17,10 @@
 
         height: 0,
 
+        top: 0,
+
+        left: 0,
+
         initialize: function (options) {
             this.id = getId();
 

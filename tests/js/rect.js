@@ -1,7 +1,7 @@
 test('can create an object', function() {
     expect(1);
 
-    var object = new Dream.Object();
+    var object = new Dream.Rect();
 
     ok(object, "Object is defined.");
 });
@@ -16,7 +16,7 @@ test('can create an object with options', function() {
         top: 30
     };
 
-    var object = new Dream.Object(options);
+    var object = new Dream.Rect(options);
 
     ok(object, "Object is defined.");
     equal(object.height, 300, "Object has correct height.");
