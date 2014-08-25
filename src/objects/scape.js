@@ -72,7 +72,7 @@
         _setDOMStyle: function (width, height) {
             this._dom.style.width = width + 'px';
             this._dom.style.height = height + 'px';
-            this._dom.style.position = "relative";
+            this._dom.style.position = "absolute";
         },
 
         _setOptions: function (options) {
@@ -83,16 +83,11 @@
             this._dom = Dream.document.getElementById(dom);
         },
 
-        fitToScape: function (layer) {
-            layer.setCanvasDimensions(this.width, this.height);
-            layer.setStyleDimensions(this.width, this.height);
-        },
-
         addLayer: function (layer) {
-            this.fitToScape(layer);
+            layer._scape = this;
             this._dom.appendChild(layer.getCanvasDOM());
             // Remove this line later
-            this._dom.appendChild(layer.getHitCanvasDOM());
+//            this._dom.appendChild(layer.getHitCanvasDOM());
             this._layers.push(layer);
         }
     });

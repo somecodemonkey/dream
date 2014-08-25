@@ -18,7 +18,6 @@ Dream.window = window;
     function extend (dest, src) {
         for (var key in src) {
             if (typeof (dest) == "function" && src.hasOwnProperty(key)) {
-                console.log("DEST IS FUNCTION ",key, dest.type);
                 dest.prototype[key] = src[key];
             } else if (src.hasOwnProperty(key)) {
                 dest[key] = src[key];
@@ -156,14 +155,32 @@ Dream.window = window;
 
         _colorMap: {},
 
+        _scape: null,
+
+        left: 0,
+
+        top: 0,
+
         name: "layer",
 
-        //TODO caching
+        backgroundColor: '',
 
         initialize: function (options) {
+            options = options || {};
+
+            this._setOptions(options);
             // extend options?
             this._setupCanvasDOM();
-            this._setupHitCanvas();
+
+            if (options.width && options.height) {
+                this.setCanvasDimensions(options.width, options.height);
+                this.setStyleDimensions(options.width, options.height);
+            }
+
+            if (options.top && options.left) {
+                this.setStyleCoords(options.left, options.top);
+            }
+
         },
 
         add: function (object) {
@@ -175,24 +192,31 @@ Dream.window = window;
             return this._objects;
         },
 
+        fitToScape: function () {
+            if (!this._scape) {
+                return
+            }
+            var scape = this._scape;
+            this.left = 0;
+            this.top = 0;
+            this.setCanvasDimensions(scape.width, scape.height);
+            this.setStyleDimensions(scape.width, scape.height);
+            this.setStyleCoords(this.left, this.top);
+        },
+
         /**
          * Renders all objects on this layer
          */
         render: function () {
-            var ctx = this._canvasContext,
-                hitctx = this._hitCanvasContext;
+            var ctx = this._canvasContext;
             for (var i = 0; i < this._objects.length; i ++) {
                 this._objects[i].render(ctx);
-//                this._objects[i].render(hitctx);
             }
         },
 
         setCanvasDimensions: function (width, height) {
             this._canvas.width = width;
             this._canvas.height = height;
-
-            this._hitCanvas.width = width;
-            this._hitCanvas.height = height;
         },
 
         setStyleDimensions: function (width, height) {
@@ -200,21 +224,17 @@ Dream.window = window;
             this._canvas.style.height = height + 'px';
         },
 
+        setStyleCoords: function (left, top) {
+            this._canvas.style.top = top + 'px';
+            this._canvas.style.left = left + 'px';
+        },
+
         getCanvasDOM: function () {
             return this._canvas;
         },
 
-        // temp
-        getHitCanvasDOM: function () {
-            return this._hitCanvas;
-        },
-
         getCanvasContext: function () {
             return this._canvasContext;
-        },
-
-        getHitCanvasContext: function () {
-            return this._hitCanvasContext;
         },
 
         colorMap: function () {
@@ -227,12 +247,6 @@ Dream.window = window;
             this._canvasContext = this._canvas.getContext('2d');
             // TODO set id for canvas as well
             this._canvas.style.position = "absolute";
-        },
-
-        _setupHitCanvas: function () {
-            this._hitCanvas = Dream.util.createCanvasElement();
-            this._hitCanvas.style.position = "relative";
-            this._hitCanvasContext = this._hitCanvas.getContext('2d');
         },
 
         _setupObjectHit: function (object) {
@@ -276,13 +290,11 @@ Dream.window = window;
         initialize: function (options) {
             this.id = Dream.util.uid();
 
-            this.setOptions(options || {});
+            this._setOptions(options || {});
         },
 
-        setOptions: function (options) {
-            for (var key in options) {
-                this[key] = options[key];
-            }
+        _setOptions: function (options) {
+            Dream.util.extend(this, options);
         },
 
         render: function (ctx) {
@@ -387,7 +399,7 @@ Dream.window = window;
         _setDOMStyle: function (width, height) {
             this._dom.style.width = width + 'px';
             this._dom.style.height = height + 'px';
-            this._dom.style.position = "relative";
+            this._dom.style.position = "absolute";
         },
 
         _setOptions: function (options) {
@@ -398,22 +410,64 @@ Dream.window = window;
             this._dom = Dream.document.getElementById(dom);
         },
 
-        fitToScape: function (layer) {
-            layer.setCanvasDimensions(this.width, this.height);
-            layer.setStyleDimensions(this.width, this.height);
-        },
-
         addLayer: function (layer) {
-            this.fitToScape(layer);
+            layer._scape = this;
             this._dom.appendChild(layer.getCanvasDOM());
             // Remove this line later
-            this._dom.appendChild(layer.getHitCanvasDOM());
+//            this._dom.appendChild(layer.getHitCanvasDOM());
             this._layers.push(layer);
         }
     });
 
 })();
+(function () {
 
+    var PREFIX = '_';
+
+    var MOUSEDOWN = 'mousedown',
+        MOUSEUP = 'mouseup',
+        MOUSEOVER = 'mouseover',
+        MOUSEOUT = 'mouseout',
+        MOUSEMOVE = 'mousemove';
+
+
+    var EVENTS = [MOUSEDOWN, MOUSEUP, MOUSEOVER, MOUSEOUT, MOUSEMOVE],
+        EVENTSLENGTH = EVENTS.length;
+
+    Dream.util.extend(Dream.Object, {
+
+        _eventHandlers: {},
+
+
+        _initListeners: function () {
+
+        },
+
+        _mousedown: function (e) {
+            var coords = Dream.util.getCoords(this, e);
+            console.log('mousedown', coords);
+        },
+
+        _mouseup: function (e) {
+            var coords = Dream.util.getCoords(this, e);
+            console.log('mouseup', coords);
+        },
+
+        _mouseover: function (e) {
+            var coords = Dream.util.getCoords(this, e);
+            console.log('mouseover', coords);
+        },
+
+        _mouseout: function (e) {
+            var coords = Dream.util.getCoords(this, e);
+            console.log('mouseleave', coords);
+        },
+
+        _mousemove: function (e) {
+//            console.log('mousemove', e);
+        }
+    });
+})();
 (function () {
 
     var PREFIX = '_';

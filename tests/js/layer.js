@@ -4,7 +4,10 @@ test('can create a dreamscape with layer', function () {
         width: 400
     });
 
-    var layer = new Dream.Layer();
+    var layer = new Dream.Layer({
+        height: 400,
+        width: 400
+    });
 
     expect(5);
     ok(layer, "Somethings should be created");

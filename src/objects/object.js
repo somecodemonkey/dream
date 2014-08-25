@@ -23,13 +23,11 @@
         initialize: function (options) {
             this.id = Dream.util.uid();
 
-            this.setOptions(options || {});
+            this._setOptions(options || {});
         },
 
-        setOptions: function (options) {
-            for (var key in options) {
-                this[key] = options[key];
-            }
+        _setOptions: function (options) {
+            Dream.util.extend(this, options);
         },
 
         render: function (ctx) {

@@ -19,14 +19,32 @@
 
         _colorMap: {},
 
+        _scape: null,
+
+        left: 0,
+
+        top: 0,
+
         name: "layer",
 
-        //TODO caching
+        backgroundColor: '',
 
         initialize: function (options) {
+            options = options || {};
+
+            this._setOptions(options);
             // extend options?
             this._setupCanvasDOM();
-            this._setupHitCanvas();
+
+            if (options.width && options.height) {
+                this.setCanvasDimensions(options.width, options.height);
+                this.setStyleDimensions(options.width, options.height);
+            }
+
+            if (options.top && options.left) {
+                this.setStyleCoords(options.left, options.top);
+            }
+
         },
 
         add: function (object) {
@@ -38,24 +56,31 @@
             return this._objects;
         },
 
+        fitToScape: function () {
+            if (!this._scape) {
+                return
+            }
+            var scape = this._scape;
+            this.left = 0;
+            this.top = 0;
+            this.setCanvasDimensions(scape.width, scape.height);
+            this.setStyleDimensions(scape.width, scape.height);
+            this.setStyleCoords(this.left, this.top);
+        },
+
         /**
          * Renders all objects on this layer
          */
         render: function () {
-            var ctx = this._canvasContext,
-                hitctx = this._hitCanvasContext;
+            var ctx = this._canvasContext;
             for (var i = 0; i < this._objects.length; i ++) {
                 this._objects[i].render(ctx);
-//                this._objects[i].render(hitctx);
             }
         },
 
         setCanvasDimensions: function (width, height) {
             this._canvas.width = width;
             this._canvas.height = height;
-
-            this._hitCanvas.width = width;
-            this._hitCanvas.height = height;
         },
 
         setStyleDimensions: function (width, height) {
@@ -63,21 +88,17 @@
             this._canvas.style.height = height + 'px';
         },
 
+        setStyleCoords: function (left, top) {
+            this._canvas.style.top = top + 'px';
+            this._canvas.style.left = left + 'px';
+        },
+
         getCanvasDOM: function () {
             return this._canvas;
         },
 
-        // temp
-        getHitCanvasDOM: function () {
-            return this._hitCanvas;
-        },
-
         getCanvasContext: function () {
             return this._canvasContext;
-        },
-
-        getHitCanvasContext: function () {
-            return this._hitCanvasContext;
         },
 
         colorMap: function () {
@@ -90,12 +111,6 @@
             this._canvasContext = this._canvas.getContext('2d');
             // TODO set id for canvas as well
             this._canvas.style.position = "absolute";
-        },
-
-        _setupHitCanvas: function () {
-            this._hitCanvas = Dream.util.createCanvasElement();
-            this._hitCanvas.style.position = "relative";
-            this._hitCanvasContext = this._hitCanvas.getContext('2d');
         },
 
         _setupObjectHit: function (object) {
