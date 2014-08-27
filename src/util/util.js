@@ -26,7 +26,6 @@
     }
 
     function callSuper() {
-        console.log(this);
         var fn = this.constructor.super,
             method = arguments[0];
 
