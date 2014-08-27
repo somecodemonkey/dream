@@ -15,36 +15,25 @@
 
         _hitCanvas: null,
 
-        _objects: [],
+        _objects: null,
 
         _colorMap: {},
 
         _scape: null,
 
-        left: 0,
-
-        top: 0,
-
-        name: "layer",
+        type: "layer",
 
         backgroundColor: '',
 
         initialize: function (options) {
             options = options || {};
+            this._objects = [];
 
             this._setOptions(options);
             // extend options?
             this._setupCanvasDOM();
 
-            if (options.width && options.height) {
-                this.setCanvasDimensions(options.width, options.height);
-                this.setStyleDimensions(options.width, options.height);
-            }
-
-            if (options.top && options.left) {
-                this.setStyleCoords(options.left, options.top);
-            }
-
+            this.id = this.id || Dream.util.uid();
         },
 
         add: function (object) {
@@ -61,11 +50,8 @@
                 return
             }
             var scape = this._scape;
-            this.left = 0;
-            this.top = 0;
             this.setCanvasDimensions(scape.width, scape.height);
             this.setStyleDimensions(scape.width, scape.height);
-            this.setStyleCoords(this.left, this.top);
         },
 
         /**
@@ -74,6 +60,7 @@
         render: function () {
             var ctx = this._canvasContext;
             for (var i = 0; i < this._objects.length; i ++) {
+                console.log(this._objects[i]);
                 this._objects[i].render(ctx);
             }
         },

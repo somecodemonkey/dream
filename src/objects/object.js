@@ -10,6 +10,8 @@
 
         _hitColor: '',
 
+        type: "object",
+
         width: 0,
 
         height: 0,
@@ -21,13 +23,13 @@
         fill: '',
 
         initialize: function (options) {
-            this.id = Dream.util.uid();
-
             this._setOptions(options || {});
+
+            this.id = this.id || Dream.util.uid();
         },
 
         _setOptions: function (options) {
-            Dream.util.extend(this, options);
+            Dream.util.addProperties(this, options);
         },
 
         render: function (ctx) {

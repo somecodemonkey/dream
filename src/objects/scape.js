@@ -85,6 +85,7 @@
 
         addLayer: function (layer) {
             layer._scape = this;
+            layer.fitToScape();
             this._dom.appendChild(layer.getCanvasDOM());
             // Remove this line later
 //            this._dom.appendChild(layer.getHitCanvasDOM());

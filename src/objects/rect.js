@@ -1,7 +1,7 @@
 (function () {
     Dream.Rect = Dream.util.createClass(Dream.Object, {
 
-        type: 'dream-rect',
+        type: 'rect',
 
         initialize: function (options) {
             this.callSuper('initialize', options);

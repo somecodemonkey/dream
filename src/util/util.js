@@ -4,11 +4,11 @@
 
     var baseId = Date.now() || +new Date;
 
-    function getId () {
+    function getId() {
         return ++baseId;
     }
 
-    function extend (dest, src) {
+    function extend(dest, src) {
         for (var key in src) {
             if (typeof (dest) == "function" && src.hasOwnProperty(key)) {
                 dest.prototype[key] = src[key];
@@ -19,20 +19,25 @@
         return dest;
     }
 
-    function callSuper (parent) {
-        return function () {
-            var method = arguments[0];
-            if (method) {
-                parent.prototype[method].apply(this, slice.call(arguments, 1));
-            }
-        };
+    function addProperties (dest, src) {
+        for (var key in src) {
+            dest[key] = src[key];
+        }
+    }
+
+    function callSuper() {
+        console.log(this);
+        var fn = this.constructor.super,
+            method = arguments[0];
+
+        if (fn && fn.prototype[method]) {
+            return fn.prototype[method].apply(this, slice.call(arguments, 1));
+        }
     }
 
     function getColor() {
-        return '#'+Math.floor(Math.random()*16777215).toString(16);
+        return '#' + Math.floor(Math.random() * 16777215).toString(16);
     }
-
-    function baseClass () {}
 
     Dream.util = {
         extend: extend,
@@ -42,32 +47,40 @@
         },
 
         createClass: function () {
-
             var props = slice.call(arguments, 0),
                 parent, index = 0;
 
-            var Class = function (){
-                this.initialize.apply(this, arguments);
+            var Class = function () {
+                return this.initialize.apply(this, arguments);
             };
-
-            Class.prototype.initialize = function () {
-                /* You must override this function */
-            };
-
-            Class.prototype.constructor = Class;
 
             if (typeof props[index] === 'function') {
                 // subclass
-                parent = props[index];
-                baseClass.prototype = parent.prototype;
-                baseClass.prototype.callSuper = callSuper(parent);
+                function emptyClass() {}
 
-                Class.prototype = new baseClass();
+                parent = props[index];
+                emptyClass.prototype = parent.prototype;
+                emptyClass.prototype.superClass = parent;
+                Class.prototype = new emptyClass();
                 index++;
             }
 
             extend(Class, props[index]);
+
+            if (!Class.prototype.initialize) {
+                Class.prototype.initialize = function () {
+                    /* You must override this function */
+                };
+            }
+            Class.prototype.callSuper = callSuper;
+            Class.prototype.constructor = Class;
+            Class.super = parent;
+
             return Class;
+        },
+
+        addProperties: function (dest, src) {
+            addProperties (dest, src)
         },
 
         addEvent: function (dom, event, func) {
@@ -98,7 +111,7 @@
             return getColor();
         },
 
-        uid: function() {
+        uid: function () {
             return getId();
         }
     };

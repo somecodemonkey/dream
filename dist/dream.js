@@ -1,4 +1,4 @@
-/*! dream - v0.0.0 - 2014-08-24
+/*! dream - v0.0.0 - 2014-08-26
 * Copyright (c) 2014 Darby Perez; Licensed  */
 var Dream = Dream || {};
 
@@ -11,11 +11,11 @@ Dream.window = window;
 
     var baseId = Date.now() || +new Date;
 
-    function getId () {
+    function getId() {
         return ++baseId;
     }
 
-    function extend (dest, src) {
+    function extend(dest, src) {
         for (var key in src) {
             if (typeof (dest) == "function" && src.hasOwnProperty(key)) {
                 dest.prototype[key] = src[key];
@@ -26,20 +26,25 @@ Dream.window = window;
         return dest;
     }
 
-    function callSuper (parent) {
-        return function () {
-            var method = arguments[0];
-            if (method) {
-                parent.prototype[method].apply(this, slice.call(arguments, 1));
-            }
-        };
+    function addProperties (dest, src) {
+        for (var key in src) {
+            dest[key] = src[key];
+        }
+    }
+
+    function callSuper() {
+        console.log(this);
+        var fn = this.constructor.super,
+            method = arguments[0];
+
+        if (fn && fn.prototype[method]) {
+            return fn.prototype[method].apply(this, slice.call(arguments, 1));
+        }
     }
 
     function getColor() {
-        return '#'+Math.floor(Math.random()*16777215).toString(16);
+        return '#' + Math.floor(Math.random() * 16777215).toString(16);
     }
-
-    function baseClass () {}
 
     Dream.util = {
         extend: extend,
@@ -49,32 +54,40 @@ Dream.window = window;
         },
 
         createClass: function () {
-
             var props = slice.call(arguments, 0),
                 parent, index = 0;
 
-            var Class = function (){
-                this.initialize.apply(this, arguments);
+            var Class = function () {
+                return this.initialize.apply(this, arguments);
             };
-
-            Class.prototype.initialize = function () {
-                /* You must override this function */
-            };
-
-            Class.prototype.constructor = Class;
 
             if (typeof props[index] === 'function') {
                 // subclass
+                function emptyClass() {};
                 parent = props[index];
-                baseClass.prototype = parent.prototype;
-                baseClass.prototype.callSuper = callSuper(parent);
-
-                Class.prototype = new baseClass();
+                emptyClass.prototype = parent.prototype;
+                emptyClass.prototype.superClass = parent;
+                Class.prototype = new emptyClass();
                 index++;
             }
 
             extend(Class, props[index]);
+
+            if (!Class.prototype.initialize) {
+                Class.prototype.initialize = function () {
+                    /* You must override this function */
+                };
+            }
+            Class.prototype.callSuper = callSuper;
+            Class.prototype.constructor = Class;
+            Class.super = parent;
+
+            console.log(Class.prototype);
             return Class;
+        },
+
+        addProperties: function (dest, src) {
+            addProperties (dest, src)
         },
 
         addEvent: function (dom, event, func) {
@@ -105,34 +118,12 @@ Dream.window = window;
             return getColor();
         },
 
-        uid: function() {
+        uid: function () {
             return getId();
         }
     };
 
 
-})();
-(function () {
-    Dream.Canvas = Dream.util.createClass({
-
-        _height: 0,
-
-        _width: 0,
-
-        _canvas: null,
-
-        _canvasContext: null,
-
-        initialize: function (options) {
-            this._setupCanvas(options);
-        },
-
-        _setupCanvas: function (options) {
-            this._canvas = Dream.util.createCanvasElement();
-            this._canvasContext = this._canvas.getContext('2d');
-        }
-
-    })
 })();
 (function () {
 
@@ -151,36 +142,25 @@ Dream.window = window;
 
         _hitCanvas: null,
 
-        _objects: [],
+        _objects: null,
 
         _colorMap: {},
 
         _scape: null,
 
-        left: 0,
-
-        top: 0,
-
-        name: "layer",
+        type: "layer",
 
         backgroundColor: '',
 
         initialize: function (options) {
             options = options || {};
+            this._objects = [];
 
             this._setOptions(options);
             // extend options?
             this._setupCanvasDOM();
 
-            if (options.width && options.height) {
-                this.setCanvasDimensions(options.width, options.height);
-                this.setStyleDimensions(options.width, options.height);
-            }
-
-            if (options.top && options.left) {
-                this.setStyleCoords(options.left, options.top);
-            }
-
+            this.id = this.id || Dream.util.uid();
         },
 
         add: function (object) {
@@ -197,11 +177,8 @@ Dream.window = window;
                 return
             }
             var scape = this._scape;
-            this.left = 0;
-            this.top = 0;
             this.setCanvasDimensions(scape.width, scape.height);
             this.setStyleDimensions(scape.width, scape.height);
-            this.setStyleCoords(this.left, this.top);
         },
 
         /**
@@ -210,6 +187,7 @@ Dream.window = window;
         render: function () {
             var ctx = this._canvasContext;
             for (var i = 0; i < this._objects.length; i ++) {
+                console.log(this._objects[i]);
                 this._objects[i].render(ctx);
             }
         },
@@ -277,6 +255,8 @@ Dream.window = window;
 
         _hitColor: '',
 
+        type: "object",
+
         width: 0,
 
         height: 0,
@@ -288,13 +268,13 @@ Dream.window = window;
         fill: '',
 
         initialize: function (options) {
-            this.id = Dream.util.uid();
-
             this._setOptions(options || {});
+
+            this.id = this.id || Dream.util.uid();
         },
 
         _setOptions: function (options) {
-            Dream.util.extend(this, options);
+            Dream.util.addProperties(this, options);
         },
 
         render: function (ctx) {
@@ -412,6 +392,7 @@ Dream.window = window;
 
         addLayer: function (layer) {
             layer._scape = this;
+            layer.fitToScape();
             this._dom.appendChild(layer.getCanvasDOM());
             // Remove this line later
 //            this._dom.appendChild(layer.getHitCanvasDOM());
